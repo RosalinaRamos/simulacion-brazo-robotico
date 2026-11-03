@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Análisis Cinemático - Brazo Robótico 3D | Grupo 01</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Fondo de Partículas Animadas -->
+  <canvas id="particles-bg"></canvas>
+
+  <!-- PANTALLA 1: PRESENTACIÓN DEL GRUPO -->
+  <section id="screen-intro" class="screen active">
+    <div class="glass-card intro-card">
+      <div class="badge-tag">Proyecto de Investigación | UCV</div>
+      <h1 class="project-title">Análisis Cinemático del Movimiento de un Brazo Robótico mediante Modelamiento y Simulación 3D</h1>
+      <p class="subtitle">Desarrollo y validación cinemática mediante entorno virtual interactivo</p>
+      
+      <div class="group-section">
+        <h2>Grupo 01 - Integrantes</h2>
+        <div class="members-grid">
+          
+          <!-- Integrante 1 (Delegado) -->
+          <div class="member-card leader">
+            <div class="avatar-box">
+              <img src="img/miguel.jpeg" alt="Miguel Llacsa" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-initials"></div>
+            </div>
+            <div class="member-info">
+              <h3>Miguel Ángel Llacsa Elías</h3>
+              <span class="role">Delegado del Grupo</span>
+            </div>
+          </div>
+
+          <!-- Integrante 2 -->
+          <div class="member-card">
+            <div class="avatar-box">
+              <img src="img/cristian.jpeg" alt="Cristian Casas" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-initials"></div>
+            </div>
+            <div class="member-info">
+              <h3>Cristian Alí Casas Marrufo</h3>
+              <span class="role">Investigador</span>
+            </div>
+          </div>
+
+          <!-- Integrante 3 -->
+          <div class="member-card">
+            <div class="avatar-box">
+              <img src="img/robinsson.jpeg" alt="Robinsson Acosta" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-initials"></div>
+            </div>
+            <div class="member-info">
+              <h3>Robinsson Luiggi Acosta Espejo</h3>
+              <span class="role">Investigador</span>
+            </div>
+          </div>
+
+          <!-- Integrante 4 -->
+          <div class="member-card">
+            <div class="avatar-box">
+              <img src="img/vladimir.jpeg" alt="Vladimir Espinoza" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-initials"></div>
+            </div>
+            <div class="member-info">
+              <h3>Vladimir Alexander Espinoza Reyes</h3>
+              <span class="role">Investigador</span>
+            </div>
+          </div>
+
+          <!-- Integrante 5 -->
+          <div class="member-card">
+            <div class="avatar-box">
+              <img src="img/eberth.jpeg" alt="Eberth Apaza" class="member-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="member-initials"></div>
+            </div>
+            <div class="member-info">
+              <h3>Eberth Apaza Tordoya</h3>
+              <span class="role">Investigador</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTÓN PRINCIPAL DE INICIO DESTACADO -->
+      <div class="start-btn-container">
+        <button id="btn-start" class="btn-primary">
+          <span>INICIAR SIMULACIÓN 3D INTERACTIVA</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA 2: SIMULADOR 3D INTERACTIVO -->
+  <section id="screen-sim" class="screen">
+    <!-- Header de la Simulación -->
+    <header class="sim-header glass-bar">
+      <button id="btn-back" class="btn-secondary">
+        Volver a Presentación
+      </button>
+      <div class="sim-title">
+        Simulación Cinemática 3D (4 DOF)
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-panels" class="btn-secondary">
+          👁️ Panel: Visible
+        </button>
+        <div class="status-pill">
+          <span class="pulse-dot"></span> Modelo 3D Activo
+        </div>
+      </div>
+    </header>
+
+    <!-- Canvas 3D Nativo -->
+    <div id="canvas-container">
+      <canvas id="robot-canvas"></canvas>
+    </div>
+
+    <!-- Guía flotante de cámara -->
+    <div class="camera-hint">
+      Arrastra para rotar 3D | Rueda/Pellizco para Zoom
+    </div>
+
+    <!-- Pestañas de Alternancia para Ventanas Reducidas -->
+    <div id="mobile-tab-bar" class="mobile-tab-bar">
+      <button id="tab-btn-controls" class="tab-btn active">Controles</button>
+      <button id="tab-btn-dh" class="tab-btn">Matriz D-H</button>
+    </div>
+
+    <!-- Panel Flotante de Control Cinemático -->
+    <aside id="panel-controls" class="control-panel glass-card panel-tab active">
+      <h3>Controles Cinemáticos</h3>
+      <p class="panel-desc">Ajusta los ángulos de articulación (θ) para manipular el prototipo.</p>
+
+      <!-- Articulación 1 -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>Base / Cintura (θ₁)</span>
+          <span id="val-q1" class="angle-val">0°</span>
+        </div>
+        <input type="range" id="slider-q1" min="-180" max="180" value="0">
+      </div>
+
+      <!-- Articulación 2 -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>Hombro (θ₂)</span>
+          <span id="val-q2" class="angle-val">30°</span>
+        </div>
+        <input type="range" id="slider-q2" min="-75" max="75" value="30">
+      </div>
+
+      <!-- Articulación 3 -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>Codo (θ₃)</span>
+          <span id="val-q3" class="angle-val">-20°</span>
+        </div>
+        <input type="range" id="slider-q3" min="-110" max="110" value="-20">
+      </div>
+
+      <!-- Efector Final / Gripper -->
+      <div class="control-group">
+        <div class="control-label">
+          <span>Efector Final (Pinza)</span>
+          <span id="val-grip" class="angle-val">Abierta</span>
+        </div>
+        <input type="range" id="slider-grip" min="0" max="100" value="30">
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="action-buttons">
+        <button id="btn-demo" class="btn-action btn-accent">
+          Rutina Automática
+        </button>
+        <button id="btn-home" class="btn-action">
+          Posición Home (0°)
+        </button>
+        <button id="btn-grid" class="btn-action">
+          Alternar Grilla
+        </button>
+      </div>
+    </aside>
+
+    <!-- Panel de Matriz D-H y Telemetría -->
+    <div id="panel-dh" class="dh-panel glass-card panel-tab">
+      <h4>Tabla Denavit-Hartenberg (D-H)</h4>
+      
+      <!-- Tabla de Parámetros D-H -->
+      <table class="dh-table">
+        <thead>
+          <tr>
+            <th>Art. (i)</th>
+            <th>θᵢ (deg)</th>
+            <th>dᵢ (cm)</th>
+            <th>aᵢ (cm)</th>
+            <th>αᵢ (deg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 (Base)</td>
+            <td id="dh-q1">0°</td>
+            <td>6.0</td>
+            <td>0.0</td>
+            <td>90°</td>
+          </tr>
+          <tr>
+            <td>2 (Hombro)</td>
+            <td id="dh-q2">30°</td>
+            <td>0.0</td>
+            <td>14.0</td>
+            <td>0°</td>
+          </tr>
+          <tr>
+            <td>3 (Codo)</td>
+            <td id="dh-q3">-20°</td>
+            <td>0.0</td>
+            <td>12.0</td>
+            <td>0°</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Matriz Homogénea T_0^3 (4x4) -->
+      <h5 class="matrix-title">Matriz Homogénea Resultante T₀³ (4x4)</h5>
+      <div class="matrix-grid" id="matrix-container">
+        <!-- Celdas dinámicas -->
+      </div>
+
+      <!-- Coordenadas del Efector Final -->
+      <div class="telemetry-bar">
+        <span>Efector Final P(X, Y, Z):</span><br>
+        X: <strong id="pos-x">0.00</strong> | 
+        Y: <strong id="pos-y">0.00</strong> | 
+        Z: <strong id="pos-z">0.00</strong> cm
+      </div>
+    </div>
+  </section>
+
+  <script src="main.js"></script>
+</body>
+</html>
